@@ -281,29 +281,26 @@ int nandroid_backup(const char* backup_path)
             return ret;
     }
 
-    if (0 != stat("/sdcard/.android_secure", &s))
+    if (0 != (ret = nandroid_backup_partition_extended(backup_path, "/cache", 0)))
+        return ret;
+
+    if (0 != stat("/sdcard/LOST.DIR", &s))
+    {
+        ui_print("External sdcard not mounted. Skipping backup.\n");
+    }
+    else
+    {
+        if (0 != (ret = nandroid_backup_partition(backup_path, "/sdcard")))
+            return ret;
+    }
+    
+    if (0 != ensure_path_mounted("/sdcard"))
     {
         ui_print("No /sdcard/.android_secure found. Skipping backup of applications on external storage.\n");
     }
     else
     {
-        if (0 != (ret = nandroid_backup_partition_extended(backup_path, "/sdcard/.android_secure", 0)))
-            return ret;
-    }
-
-    if (0 != (ret = nandroid_backup_partition_extended(backup_path, "/cache", 0)))
-        return ret;
-
-    vol = volume_for_path("/sd-ext");
-    if (vol == NULL || 0 != stat(vol->device, &s))
-    {
-        ui_print("No sd-ext found. Skipping backup of sd-ext.\n");
-    }
-    else
-    {
-        if (0 != ensure_path_mounted("/sd-ext"))
-            ui_print("Could not mount sd-ext. sd-ext backup may not be supported on this device. Skipping backup of sd-ext.\n");
-        else if (0 != (ret = nandroid_backup_partition(backup_path, "/sd-ext")))
+        if (0 != (ret = nandroid_backup_partition_extended(backup_path, "/sdcard/.android_secure", 1)))
             return ret;
     }
 
@@ -578,7 +575,7 @@ int nandroid_restore(const char* backup_path, int restore_boot, int restore_syst
     if (restore_cache && 0 != (ret = nandroid_restore_partition_extended(backup_path, "/cache", 0)))
         return ret;
 
-    if (restore_sdext && 0 != (ret = nandroid_restore_partition(backup_path, "/sd-ext")))
+    if (restore_sdext && 0 != (ret = nandroid_restore_partition(backup_path, "/sdcard)))
         return ret;
 
     sync();
