@@ -713,11 +713,10 @@ void show_nandroid_advanced_restore_menu(const char* path)
         return;
     }
 
-    static char* advancedheaders[] = {  "Choose an image to restore",
+    static char* advancedheaders[] = {  "Images",
                                 "",
-                                "Choose an image to restore",
-                                "first. The next menu will",
-                                "you more options.",
+                                "Choose the image you",
+                                "would like to restore.",
                                 "",
                                 NULL
     };
@@ -737,7 +736,7 @@ void show_nandroid_advanced_restore_menu(const char* path)
                             "Restore system",
                             "Restore data",
                             "Restore cache",
-                            "Restore sd-ext",
+                            "Restore sdcard",
                             "Restore wimax",
                             NULL
     };
@@ -769,7 +768,7 @@ void show_nandroid_advanced_restore_menu(const char* path)
                 nandroid_restore(file, 0, 0, 0, 1, 0, 0);
             break;
         case 4:
-            if (confirm_selection(confirm_restore, "Yes - Restore sd-ext"))
+            if (confirm_selection(confirm_restore, "Yes - Restore sdcard"))
                 nandroid_restore(file, 0, 0, 0, 0, 1, 0);
             break;
         case 5:
@@ -867,8 +866,7 @@ void show_advanced_menu()
                                 NULL
     };
 
-    static char* list[] = { "Reboot Recovery",
-                            "Wipe Dalvik Cache",
+    static char* list[] = { "Wipe Dalvik Cache",
                             "Wipe Battery Stats",
                             "Report Error",
                             "Key Test",
@@ -892,34 +890,29 @@ void show_advanced_menu()
         {
             case 0:
             {
-                reboot_wrapper("recovery");
-                break;
-            }
-            case 1:
-            {
                 if (0 != ensure_path_mounted("/data"))
                     break;
-                ensure_path_mounted("/sd-ext");
+                ensure_path_mounted("/sdcard");
                 ensure_path_mounted("/cache");
                 if (confirm_selection( "Confirm wipe?", "Yes - Wipe Dalvik Cache")) {
                     __system("rm -r /data/dalvik-cache");
                     __system("rm -r /cache/dalvik-cache");
-                    __system("rm -r /sd-ext/dalvik-cache");
+                    __system("rm -r /sdcard/dalvik-cache");
                     ui_print("Dalvik Cache wiped.\n");
                 }
                 ensure_path_unmounted("/data");
                 break;
             }
-            case 2:
+            case 1:
             {
                 if (confirm_selection( "Confirm wipe?", "Yes - Wipe Battery Stats"))
                     wipe_battery_stats();
                 break;
             }
-            case 3:
+            case 2:
                 handle_failure(1);
                 break;
-            case 4:
+            case 3:
             {
                 ui_print("Outputting key codes.\n");
                 ui_print("Go back to end debugging.\n");
@@ -934,12 +927,12 @@ void show_advanced_menu()
                 while (action != GO_BACK);
                 break;
             }
-            case 5:
+            case 4:
             {
                 ui_printlogtail(12);
                 break;
             }
-            case 6:
+            case 5:
             {
                 static char* ext_sizes[] = { "128M",
                                              "256M",
@@ -982,7 +975,7 @@ void show_advanced_menu()
                     ui_print("An error occured while partitioning your SD Card. Please see /tmp/recovery.log for more details.\n");
                 break;
             }
-            case 7:
+            case 6:
             {
                 ensure_path_mounted("/system");
                 ensure_path_mounted("/data");
@@ -991,7 +984,7 @@ void show_advanced_menu()
                 ui_print("Done!\n");
                 break;
             }
-            case 8:
+            case 7:
             {
                 static char* ext_sizes[] = { "128M",
                                              "256M",
@@ -1157,7 +1150,7 @@ void handle_failure(int ret)
         return;
     mkdir("/sdcard/clockworkmod", S_IRWXU);
     __system("cp /tmp/recovery.log /sdcard/clockworkmod/recovery.log");
-    ui_print("/tmp/recovery.log was copied to /sdcard/clockworkmod/recovery.log. Please open ROM Manager to report the issue.\n");
+    ui_print("/tmp/recovery.log was copied to /sdcard/clockworkmod/recovery.log.\n");
 }
 
 int is_path_mounted(const char* path) {
