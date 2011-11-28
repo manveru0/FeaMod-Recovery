@@ -658,7 +658,7 @@ wipe_data(int confirm) {
             title_headers = prepend_title((const char**)headers);
         }
 
-        char* items[] = { " No",
+        char* items[] = { " No",                
                           " Yes -- delete all user data",   // [1]
                           NULL };
 

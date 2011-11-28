@@ -547,9 +547,9 @@ int nandroid_restore(const char* backup_path, int restore_boot, int restore_syst
         if (0 != stat(tmp, &st))
         {
             ui_print("WARNING: WiMAX partition exists, but nandroid\n");
-            ui_print(" backup does not contain WiMAX image.\n");
-            ui_print(" You should create a new backup to\n");
-            ui_print(" protect your WiMAX keys.\n");
+            ui_print("         backup does not contain WiMAX image.\n");
+            ui_print("         You should create a new backup to\n");
+            ui_print("         protect your WiMAX keys.\n");
         }
         else
         {
