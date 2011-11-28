@@ -743,7 +743,7 @@ void show_nandroid_advanced_restore_menu(const char* path)
         return;
     }
 
-    static char* advancedheaders[] = {  "Imagess",
+    static char* advancedheaders[] = {  "Images",
                                 "",
                                 "Choose the image you'd",
                                 "like to restore.",
