@@ -8,7 +8,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/reboot.h>
-#include <reboot/reboot.h>
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
@@ -42,6 +41,7 @@
 #include <libgen.h>
 #include "mtdutils/mtdutils.h"
 #include "bmlutils/bmlutils.h"
+#include "cutils/android_reboot.h"
 
 
 int signature_check_enabled = 1;
@@ -420,19 +420,10 @@ int confirm_selection(const char* title, const char* confirm)
 	}
 	else {
 		char* items[] = { "No",
-						"No",
-						"No",
-						"No",
-						"No",
-						"No",
-						"No",
-						confirm, //" Yes -- wipe partition",   // [7]
-						"No",
-						"No",
-						"No",
+						confirm, //" Yes -- wipe partition",   // [1]
 						NULL };
 		int chosen_item = get_menu_selection(confirm_headers, items, 0, 0);
-		return chosen_item == 7;
+		return chosen_item == 1;
 	}
 	}
 
@@ -452,6 +443,9 @@ int format_device(const char *device, const char *path, const char *fs_type) {
             return -1;
         LOGE("unknown volume \"%s\"\n", path);
         return -1;
+    }
+    if (strstr(path, "/data") == path && volume_for_path("/sdcard") == NULL && is_data_media()) {
+        return format_unknown_device(NULL, path, NULL);
     }
     if (strcmp(fs_type, "ramdisk") == 0) {
         // you can't format the ramdisk.
@@ -743,7 +737,7 @@ void show_nandroid_advanced_restore_menu(const char* path)
         return;
     }
 
-    static char* advancedheaders[] = {  "Images",
+   static char* advancedheaders[] = { "Images",
                                 "",
                                 "Choose the image you'd",
                                 "like to restore.",
@@ -824,7 +818,7 @@ void show_nandroid_menu()
                             NULL
     };
 
-    if (volume_for_path("/emmc") == NULL)
+    if (volume_for_path("/emmc") == NULL || volume_for_path("/sdcard") == NULL && is_data_media())
         list[3] = NULL;
 
     int chosen_item = get_menu_selection(headers, list, 0, 0);
@@ -921,7 +915,7 @@ void show_advanced_menu()
         {
             case 0:
             {
-                reboot_wrapper("recovery");
+                android_reboot(ANDROID_RB_RESTART2, 0, "recovery");
                 break;
             }
             case 1:
